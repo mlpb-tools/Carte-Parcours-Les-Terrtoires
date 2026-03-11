@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Carte PLT 2026 - Planning Complet</title>
+    <title>Carte PLT 2026 - Planning Strict & Zones</title>
     
     <!-- Polices Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,7 +68,7 @@
             padding: 0;
         }
         .leaflet-popup-tip-container { display: none; }
-        .leaflet-popup-content { margin: 12px; width: 240px !important; }
+        .leaflet-popup-content { margin: 12px; width: 250px !important; }
 
         /* Ajustements UI */
         #map { height: 100%; width: 100%; z-index: 10; }
@@ -77,8 +77,18 @@
         /* Checkbox style */
         .custom-checkbox:checked + div { background-color: #1a1a1a; border-color: #1a1a1a; }
         .custom-checkbox:checked + div svg { display: block; }
+
+        .zone-checkbox:checked + div { background-color: #f3f4f6; border-color: #1a1a1a; box-shadow: 2px 2px 0px 0px black; }
+        .zone-checkbox:not(:checked) + div { opacity: 0.6; box-shadow: none; border-color: #ccc; }
+        .zone-checkbox:checked + div .indicator { background-color: #10b981; }
+        .zone-checkbox:not(:checked) + div .indicator { background-color: #ef4444; }
         
         body.drawer-open { overflow: hidden; }
+
+        /* Scrollbar pour le menu */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-[#f8f9fa] h-screen overflow-hidden flex flex-col font-body">
@@ -100,57 +110,102 @@
     <div class="flex-grow relative flex overflow-hidden">
         
         <!-- Panneau latéral / Tiroir (Drawer) -->
-        <aside id="drawer" class="fixed inset-y-0 right-0 md:relative md:inset-auto w-[280px] bg-white z-[100] md:z-20 border-l-4 md:border-l-0 md:border-r-4 border-black transform translate-x-full md:translate-x-0 drawer-transition flex flex-col shadow-2xl md:shadow-none">
+        <aside id="drawer" class="fixed inset-y-0 right-0 md:relative md:inset-auto w-[300px] bg-white z-[100] md:z-20 border-l-4 md:border-l-0 md:border-r-4 border-black transform translate-x-full md:translate-x-0 drawer-transition flex flex-col shadow-2xl md:shadow-none">
             
             <div class="flex items-center justify-between p-3 border-b-2 border-black bg-gray-50">
-                <h2 class="font-header font-bold text-sm uppercase tracking-wider text-gray-700">Navigation</h2>
+                <h2 class="font-header font-bold text-sm uppercase tracking-wider text-gray-700">Filtres Carte</h2>
                 <button onclick="toggleDrawer()" class="md:hidden w-8 h-8 bg-white border-2 border-black rounded-full flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
 
-            <div class="p-4 flex flex-col gap-4 overflow-y-auto flex-grow">
-                <!-- Filtres Compacts -->
-                <div class="space-y-2">
-                    <label class="flex items-center cursor-pointer group">
-                        <input type="checkbox" id="check-ralliement" class="custom-checkbox hidden" checked>
-                        <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
-                        <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-red-500 font-bold text-white shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Etapes & RDV</span>
-                    </label>
-                    <label class="flex items-center cursor-pointer group">
-                        <input type="checkbox" id="check-culture" class="custom-checkbox hidden" checked>
-                        <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
-                        <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-fuchsia-500 font-bold text-white shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Culture</span>
-                    </label>
-                    <label class="flex items-center cursor-pointer group">
-                        <input type="checkbox" id="check-institution" class="custom-checkbox hidden" checked>
-                        <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
-                        <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-blue-500 font-bold text-white shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Institutions</span>
-                    </label>
-                    <label class="flex items-center cursor-pointer group">
-                        <input type="checkbox" id="check-entreprise" class="custom-checkbox hidden" checked>
-                        <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
-                        <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-emerald-500 font-bold text-white shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Entreprises</span>
-                    </label>
-                    <label class="flex items-center cursor-pointer group">
-                        <input type="checkbox" id="check-repas" class="custom-checkbox hidden" checked>
-                        <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
-                        <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-yellowAccent font-bold text-black shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Repas</span>
-                    </label>
+            <div class="p-4 flex flex-col gap-5 overflow-y-auto flex-grow custom-scroll">
+                
+                <!-- Filtres ZONES TERRITORIALES -->
+                <div>
+                    <h3 class="text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest border-b border-gray-200 pb-1">Zones Territoriales</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="cursor-pointer col-span-2">
+                            <input type="checkbox" id="zone-pleniere" class="zone-checkbox hidden filter-trigger" checked value="pleniere">
+                            <div class="border-2 rounded p-2 text-center transition-all h-full flex flex-col justify-center items-center gap-1 relative">
+                                <span class="indicator w-2 h-2 rounded-full absolute top-1.5 right-1.5"></span>
+                                <span class="text-[9px] font-bold uppercase leading-tight">Général / Plénières</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" id="zone-bab" class="zone-checkbox hidden filter-trigger" checked value="bab">
+                            <div class="border-2 rounded p-2 text-center transition-all h-full flex flex-col justify-center items-center gap-1 relative">
+                                <span class="indicator w-2 h-2 rounded-full absolute top-1.5 right-1.5"></span>
+                                <span class="text-[9px] font-bold uppercase leading-tight">Côte Basque Adour</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" id="zone-seignanx" class="zone-checkbox hidden filter-trigger" checked value="seignanx">
+                            <div class="border-2 rounded p-2 text-center transition-all h-full flex flex-col justify-center items-center gap-1 relative">
+                                <span class="indicator w-2 h-2 rounded-full absolute top-1.5 right-1.5"></span>
+                                <span class="text-[9px] font-bold uppercase leading-tight">Seignanx</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" id="zone-sudpb" class="zone-checkbox hidden filter-trigger" checked value="sudpb">
+                            <div class="border-2 rounded p-2 text-center transition-all h-full flex flex-col justify-center items-center gap-1 relative">
+                                <span class="indicator w-2 h-2 rounded-full absolute top-1.5 right-1.5"></span>
+                                <span class="text-[9px] font-bold uppercase leading-tight">Sud PB / Transfrontalier</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" id="zone-errobi" class="zone-checkbox hidden filter-trigger" checked value="errobi">
+                            <div class="border-2 rounded p-2 text-center transition-all h-full flex flex-col justify-center items-center gap-1 relative">
+                                <span class="indicator w-2 h-2 rounded-full absolute top-1.5 right-1.5"></span>
+                                <span class="text-[9px] font-bold uppercase leading-tight">Errobi / Hasparren</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" id="zone-amikuze" class="zone-checkbox hidden filter-trigger" checked value="amikuze">
+                            <div class="border-2 rounded p-2 text-center transition-all h-full flex flex-col justify-center items-center gap-1 relative">
+                                <span class="indicator w-2 h-2 rounded-full absolute top-1.5 right-1.5"></span>
+                                <span class="text-[9px] font-bold uppercase leading-tight">Amikuze / Xiberoa</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" id="zone-garazi" class="zone-checkbox hidden filter-trigger" checked value="garazi">
+                            <div class="border-2 rounded p-2 text-center transition-all h-full flex flex-col justify-center items-center gap-1 relative">
+                                <span class="indicator w-2 h-2 rounded-full absolute top-1.5 right-1.5"></span>
+                                <span class="text-[9px] font-bold uppercase leading-tight">Garazi</span>
+                            </div>
+                        </label>
+                    </div>
                 </div>
 
-                <!-- Aide Contextuelle -->
-                <div class="border-2 border-black rounded-xl p-3 bg-gray-50 text-[10px] font-bold text-gray-600 leading-tight mt-4">
-                    <p class="uppercase text-gray-400 mb-2 border-b border-gray-200 pb-1 italic text-[9px]">Légende Etapes</p>
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-clock text-cyanAccent"></i>
-                            <span>Cliquez sur l'heure pour la modifier</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-phone text-emerald-500"></i>
-                            <span>Contact / Téléphone renseigné</span>
-                        </div>
+                <!-- Filtres THEMES -->
+                <div>
+                    <h3 class="text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest border-b border-gray-200 pb-1">Thématiques</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" id="theme-ralliement" class="custom-checkbox hidden filter-trigger" checked value="ralliement">
+                            <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
+                            <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-red-500 font-bold text-white shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Etapes & Ralliements</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" id="theme-culture" class="custom-checkbox hidden filter-trigger" checked value="culture">
+                            <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
+                            <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-fuchsia-500 font-bold text-white shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Assos Sport & Culture</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" id="theme-institution" class="custom-checkbox hidden filter-trigger" checked value="institution">
+                            <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
+                            <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-blue-500 font-bold text-white shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Institutions Publiques</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" id="theme-entreprise" class="custom-checkbox hidden filter-trigger" checked value="entreprise">
+                            <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
+                            <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-emerald-500 font-bold text-white shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Entreprises</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" id="theme-repas" class="custom-checkbox hidden filter-trigger" checked value="repas">
+                            <div class="w-5 h-5 border-2 border-black rounded mr-2 flex items-center justify-center bg-white transition-colors"><svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>
+                            <span class="flex-grow py-1 px-3 border-2 border-black rounded-lg bg-yellowAccent font-bold text-black shadow-[2px_2px_0px_0px_black] text-[10px] uppercase tracking-tighter">Restauration</span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -188,14 +243,6 @@
             attribution: '&copy; Google'
         }).addTo(map);
 
-        const layers = {
-            ralliement: L.layerGroup().addTo(map),
-            culture: L.layerGroup().addTo(map),
-            institution: L.layerGroup().addTo(map),
-            entreprise: L.layerGroup().addTo(map),
-            repas: L.layerGroup().addTo(map)
-        };
-
         const themes = {
             ralliement: { css: 'theme-ralliement', icon: 'fa-solid fa-thumbtack', hex: '#ef4444' },
             culture: { css: 'theme-culture', icon: 'fa-solid fa-masks-theater', hex: '#d946ef' },
@@ -204,47 +251,62 @@
             repas: { css: 'theme-repas', icon: 'fa-solid fa-utensils', hex: '#ffb703' }
         };
 
-        // Données complètes avec l'intégration des CONTACTS & TELEPHONES du fichier Excel
+        // Données complètes avec BAB et Seignanx réintégrés
         const locations = [
-            // REGROUPEMENTS PLENIERES
-            { lat: 43.329, lng: -1.405, type: 'ralliement', title: 'Sanoki (Itxassou)', address: 'Salle Sanoki', legend: '16/03 / Itxassou / Lancement en plénière', time: '09:00 - 16:30' },
-            { lat: 43.382, lng: -1.303, type: 'ralliement', title: 'Hasparren (Pôle Territorial)', address: 'Pôle Territorial', legend: '19/03 & 31/03 / Hasparren / Restitution', time: '09:00 - 17:00' },
-            { lat: 43.395, lng: -1.458, type: 'ralliement', title: 'Ustaritz (Mairie Lapurdi)', address: 'Place du Labourd', legend: '30/03 / Ustaritz / Travail de restitution', time: '09:00 - 16:30' },
+            // --- GENERAL / PLENIERES ---
+            { zone: 'pleniere', lat: 43.329, lng: -1.405, type: 'ralliement', title: 'Sanoki (Itxassou)', address: 'Salle Sanoki', legend: '16/03 / Lancement en plénière', time: '09:00' },
+            { zone: 'pleniere', lat: 43.382, lng: -1.303, type: 'ralliement', title: 'Hasparren (Pôle Territorial)', address: 'Pôle Territorial', legend: '19/03 & 31/03 / Restitution', time: '09:00' },
+            { zone: 'pleniere', lat: 43.395, lng: -1.458, type: 'ralliement', title: 'Ustaritz (Mairie Lapurdi)', address: 'Place du Labourd', legend: '30/03 / Travail de restitution', time: '09:00' },
+            { zone: 'pleniere', lat: 43.225, lng: -0.889, type: 'ralliement', title: 'MSP Mauléon / St-Palais', address: 'Soule & Amikuze', legend: '17, 23, 24, 25 Mars / Ralliements Territoires', time: '08:30' },
             
-            // RALLIEMENTS TERRITOIRES
-            { lat: 43.225, lng: -0.889, type: 'ralliement', title: 'MSP Mauléon', address: '14 Av. de Belzunce', legend: '17, 23, 24, 25 Mars / Mauléon / Visites Soule', time: '08:30' },
-            { lat: 43.333, lng: -1.025, type: 'ralliement', title: 'MSP Saint-Palais', address: '1355 route d\'Esquilamborde', legend: '17, 23, 24, 25 Mars / St-Palais / Visites Amikuze', time: '08:30' },
-            { lat: 43.167, lng: -1.229, type: 'ralliement', title: 'MSP Garazi', address: 'Route de St-Jean-Pied-de-Port', legend: '17, 23, 24, 25 Mars / Ispoure / Visites Garazi', time: '08:30' },
-            { lat: 43.175, lng: -1.346, type: 'ralliement', title: 'Mairie de Baïgorry', address: '21 Gaineko karrika', legend: '17, 23, 24, 25 Mars / Baïgorry / Visites Garazi', time: '08:30' },
-            
-            // --- SITES AMIKUZE / XIBEROA (avec Contacts Excel) ---
-            { lat: 43.328, lng: -1.033, type: 'entreprise', title: 'Lycée Jean Errecart (Ifria)', address: 'Saint-Palais', legend: '25/03 / Action Ifria + Agro Alimentaire', time: '10:00', contact: 'André Larralde : 06 12 64 70 75' },
-            { lat: 43.329, lng: -1.035, type: 'culture', title: 'Bilbaka à Amikuze', address: 'Saint-Palais', legend: '25/03 / Visite du site', time: '14:00', contact: 'Irola Stéphane : 06 80 98 87 40' },
-            { lat: 43.224, lng: -0.890, type: 'culture', title: 'Beritxa (Cie Danse)', address: 'Mauléon', legend: '24/03 / Spectacle Danse', time: '10:00', contact: 'Etchecopar Camu' },
-            { lat: 43.227, lng: -0.887, type: 'institution', title: 'ODACE Mauléon', address: 'Rue des Frères Barenne', legend: '24/03 / Visite Appui Entreprises', time: '10:00', contact: '06 84 70 17 08' },
-            { lat: 43.226, lng: -0.892, type: 'entreprise', title: 'SPIREO', address: 'Mauléon', legend: '24/03 / Visite Entreprise', time: '14:30' },
-            { lat: 43.327, lng: -1.031, type: 'repas', title: 'Restaurant Xibiouz', address: 'Saint-Palais', legend: '25/03 / Repas', time: '12:30', contact: 'Sylvie Doxaran : 07 60 71 63 11' },
-            { lat: 43.222, lng: -0.889, type: 'repas', title: 'Euskalduna', address: 'Mauléon', legend: '24/03 / Repas', time: '12:30' },
+            // --- CÔTE BASQUE ADOUR (BAB) ---
+            { zone: 'bab', lat: 43.498, lng: -1.460, type: 'ralliement', title: 'ML ZUP Bayonne', address: '7 bis avenue de Jouandin', legend: '17, 23, 24, 25 Mars / Visites CBA', time: '08:30' },
+            { zone: 'bab', lat: 43.492, lng: -1.509, type: 'ralliement', title: 'ML Anglet', address: '10 Rue du Pont de l\'Aveugle', legend: '17, 23, 24, 25 Mars / Visites CBA', time: '08:30' },
+            { zone: 'bab', lat: 43.440, lng: -1.551, type: 'entreprise', title: 'IZARRALDE DATA', address: 'Bidart', legend: '24/03 / Visite Numérique', time: '10:00' },
+            { zone: 'bab', lat: 43.495, lng: -1.474, type: 'entreprise', title: 'CFA IFRIA Bayonne', address: 'Av. Foch', legend: '25/03 / Visite Agroalimentaire', time: '10:00' },
 
-            // --- SITES GARAZI (avec Contacts Excel) ---
-            { lat: 43.164, lng: -1.238, type: 'entreprise', title: 'Pays Basque au Coeur', address: 'Garazi', legend: '25/03 / AKILICOP & Récolte du monde', time: '10:00' },
-            { lat: 43.165, lng: -1.235, type: 'culture', title: 'Club Pelote Goizeko Izarra', address: 'Garazi', legend: '24/03 / Sport', time: '14:00', contact: 'Mme Carricaburru : 06 81 49 87 01' },
-            { lat: 43.166, lng: -1.239, type: 'institution', title: 'Ataria / MSP Garazi', address: 'Garazi', legend: '24/03 / Lecture Paysage & France Service', time: '10:00', contact: 'Indart : 06 25 50 48 23' },
-            { lat: 43.168, lng: -1.240, type: 'institution', title: 'Recyclerie Lokala', address: 'Garazi', legend: '24/03 / Visite Recyclerie (1h max)', time: '11:00', contact: '06 41 95 35 26 (pas de restauration)' },
-            { lat: 43.165, lng: -1.236, type: 'repas', title: 'Le Chat Perché', address: 'Garazi', legend: '17/03 et 24/03 / Repas', time: '12:30', contact: '05 24 34 11 49' },
-            { lat: 43.163, lng: -1.234, type: 'repas', title: 'Restaurant Chez Dédé', address: 'Garazi', legend: '25/03 / Repas', time: '12:30', contact: '05 24 34 11 49' },
+            // --- SEIGNANX ---
+            { zone: 'seignanx', lat: 43.540, lng: -1.460, type: 'ralliement', title: 'Mairie de Tarnos', address: '14 Bd Jacques Duclos', legend: '17, 23, 24, 25 Mars / Visites Seignanx', time: '08:30' },
+            { zone: 'seignanx', lat: 43.541, lng: -1.458, type: 'culture', title: 'GRANDOLA Tarnos', address: 'Bd Jacques Duclos', legend: '24/03 / Visite Tiers-Lieu', time: '10:00' },
 
-            // --- SITES SUD PB / TRANSFRONTALIER (avec Contacts Excel) ---
-            { lat: 43.266, lng: -1.503, type: 'entreprise', title: 'BASERRIBERRI & Ent Urdax', address: 'Urdax', legend: '25/03 / Entreprise & Restauration', time: '10:00' },
-            { lat: 43.396, lng: -1.683, type: 'culture', title: 'Trainière Sokoa', address: 'Port de Socoa', legend: '24/03 / Culture/Sport (À confirmer)', time: '14:30' },
-            { lat: 43.376, lng: -1.748, type: 'institution', title: 'CPIE HENDAYE', address: 'Domaine d\'Abbadia', legend: '24/03 / Visite Environnement / Château', time: '09:30' },
-            { lat: 43.358, lng: -1.775, type: 'repas', title: 'l\'Océ', address: 'Hendaye', legend: '24/03 / Repas', time: '12:30', contact: '05 59 20 71 64' },
-            { lat: 43.359, lng: -1.776, type: 'repas', title: 'O\'Yuk', address: 'Hendaye', legend: '24/03 / Repas', time: '12:30', contact: '05 24 33 54 63' },
-            { lat: 43.360, lng: -1.777, type: 'repas', title: 'Sukaldea', address: 'Hendaye', legend: '17/03 / Repas', time: '12:30', contact: '05 59 20 83 21' },
-            { lat: 43.265, lng: -1.505, type: 'repas', title: 'Restaurant sur Urdax', address: 'Urdax', legend: '25/03 / Repas', time: '12:30' },
+            // --- AMIKUZE / XIBEROA ---
+            { zone: 'amikuze', lat: 43.328, lng: -1.033, type: 'entreprise', title: 'Lycée Jean Errecart', address: 'Saint-Palais', legend: '25-03 : Action Ifria + visite entreprise Agro Alimentaire', time: 'A définir', contact: 'André Larralde : 06,12,64,70,75' },
+            { zone: 'amikuze', lat: 43.329, lng: -1.035, type: 'culture', title: 'Bilbaka à Amikuze', address: 'Saint-Palais', legend: '25-03 : Visite du site', time: '14:00', contact: 'Irola Stéphane : 06,80,98,87,40' },
+            { zone: 'amikuze', lat: 43.224, lng: -0.890, type: 'culture', title: 'Berritza : Cie Danse', address: 'Mauléon', legend: '24-03 : Danse', time: '14:00', contact: 'Maité Irigoyen / Etchecopar Camu' },
+            { zone: 'amikuze', lat: 43.227, lng: -0.887, type: 'institution', title: 'Odace + AZIA', address: 'Mauléon', legend: '24-03 : Odace + AZIA', time: '09:15 - 11:00', contact: '06.84.70.17.08' },
+            { zone: 'amikuze', lat: 43.226, lng: -0.892, type: 'entreprise', title: 'SPI AERO', address: 'Mauléon', legend: '24-03 : Visite Entreprise SPI AERO', time: '11:00 - 12:00' },
+            { zone: 'amikuze', lat: 43.221, lng: -0.891, type: 'institution', title: 'Château Fort', address: 'Mauléon', legend: 'Lecture de paysage depuis le château Fort', time: 'A définir', contact: 'Philippe Mayté' },
+            { zone: 'amikuze', lat: 43.327, lng: -1.031, type: 'repas', title: 'Restaurant Xibiouz', address: 'St Palais', legend: '25-03 : Repas', time: 'A définir', contact: 'Sylvie Doxaran : 07.60.71.63.11' },
+            { zone: 'amikuze', lat: 43.222, lng: -0.889, type: 'repas', title: 'Restaurant Euskalduna', address: 'Mauléon', legend: '24-03 : Repas', time: 'A définir' },
 
-            // --- SITES ERROBI ---
-            { lat: 43.359, lng: -1.399, type: 'entreprise', title: 'Imprimerie MENDIBOURE', address: 'Cambo', legend: '25/03 / Visite Industrie (9h30)', time: '09:30' }
+            // --- GARAZI ---
+            { zone: 'garazi', lat: 43.164, lng: -1.238, type: 'entreprise', title: 'Pays Basque au Coeur', address: 'Garazi', legend: '25-03 : AKILICOP et Récolte du monde', time: 'A définir' },
+            { zone: 'garazi', lat: 43.165, lng: -1.235, type: 'culture', title: 'Club de pelote Goizeko Izarra', address: 'Garazi', legend: '24-03 : Sport', time: '14:30', contact: '06.81.49.87.01 (Mme Carricaburru)' },
+            { zone: 'garazi', lat: 43.166, lng: -1.239, type: 'institution', title: 'Lecture Paysage', address: 'Garazi', legend: '24-03 : Lecture Paysage avec Ataria', time: '09:00' },
+            { zone: 'garazi', lat: 43.168, lng: -1.237, type: 'institution', title: 'MSP Garazi', address: 'Garazi', legend: '24-03 : visite France Service (1h)', time: 'A définir', contact: 'Indart : 06,25,50,48,23' },
+            { zone: 'garazi', lat: 43.169, lng: -1.240, type: 'institution', title: 'Recyclerie Lokala', address: 'Garazi', legend: '24-03 : Visite (durée 1h max)', time: '11:00', contact: '0641953526 (pas de restauration)' },
+            { zone: 'garazi', lat: 43.165, lng: -1.236, type: 'repas', title: 'Restaurant le Chat Perché', address: 'Garazi', legend: '17/03 et 24/03 : Repas', time: 'A définir', contact: '05.24.34.11.49' },
+            { zone: 'garazi', lat: 43.163, lng: -1.234, type: 'repas', title: 'Restaurant Chez Dédé', address: 'Garazi', legend: '25-03 : Repas', time: 'A définir', contact: '05.24.34.11.49' },
+
+            // --- SUD PB / TRANSFRONTALIER ---
+            { zone: 'sudpb', lat: 43.266, lng: -1.503, type: 'entreprise', title: 'Baserriberri + Ent Urdax', address: 'Urdax', legend: '25-03 : Entreprises', time: 'A définir' },
+            { zone: 'sudpb', lat: 43.396, lng: -1.683, type: 'culture', title: 'Trainière de Socoa ?', address: 'Socoa', legend: 'A confirmer', time: 'A définir' },
+            { zone: 'sudpb', lat: 43.376, lng: -1.748, type: 'institution', title: 'CPIE + alentour Château Abadia', address: 'Hendaye', legend: '24-03 : Visite', time: '09:30 - 10:00' },
+            { zone: 'sudpb', lat: 43.358, lng: -1.775, type: 'repas', title: 'l\'Océ', address: 'Hendaye', legend: '24-03 : Repas', time: 'A définir', contact: '05.59.20.71.64' },
+            { zone: 'sudpb', lat: 43.359, lng: -1.776, type: 'repas', title: 'O\'Yuk', address: 'Hendaye', legend: '24-03 : Repas', time: 'A définir', contact: '05.24.33.54.63' },
+            { zone: 'sudpb', lat: 43.360, lng: -1.777, type: 'repas', title: 'Sukaldea', address: 'Hendaye', legend: '17-03 : Repas', time: 'A définir', contact: '05 59 20 83 21' },
+            { zone: 'sudpb', lat: 43.265, lng: -1.505, type: 'repas', title: 'Restaurant Landibar', address: 'Urdax', legend: '25-03 : Repas', time: 'A définir' },
+
+            // --- ERROBI / PAYS D'HASPARREN ---
+            { zone: 'errobi', lat: 43.359, lng: -1.399, type: 'entreprise', title: 'Imprimerie Mendiboure', address: 'Cambo', legend: '25-03 : Visite Imprimerie', time: '09:30' },
+            { zone: 'errobi', lat: 43.358, lng: -1.398, type: 'entreprise', title: 'Librairie Margot', address: 'Cambo', legend: '25-03 : Visite Librairie', time: '11:00' },
+            { zone: 'errobi', lat: 43.361, lng: -1.400, type: 'culture', title: 'Musée Arnaga ????', address: 'Cambo', legend: '24-03 : Musée', time: 'A définir' },
+            { zone: 'errobi', lat: 43.385, lng: -1.305, type: 'culture', title: 'Soinubila', address: 'Hasparren', legend: 'Ecole de musique', time: 'A définir', contact: '07 61 89 44 34' },
+            { zone: 'errobi', lat: 43.365, lng: -1.255, type: 'culture', title: '2-Château Garroa', address: 'Mendionde', legend: 'Visite', time: 'A définir', contact: '06,70182640 / 0678939578' },
+            { zone: 'errobi', lat: 43.386, lng: -1.306, type: 'culture', title: 'Régis Pochelu', address: 'Hasparren', legend: 'Sculpteur', time: 'A définir', contact: '0626721838' },
+            { zone: 'errobi', lat: 43.384, lng: -1.304, type: 'culture', title: '1- Ferme Uhaldia', address: 'Hasparren', legend: 'Visite Ferme', time: 'A définir', contact: 'Julia Abadie' },
+            { zone: 'errobi', lat: 43.383, lng: -1.304, type: 'institution', title: 'ALDATU', address: 'Hasparren', legend: '24-03 : Visite/Rencontre', time: '14:00 - 16:00' },
+            { zone: 'errobi', lat: 43.382, lng: -1.303, type: 'repas', title: 'Restaurant Argia', address: 'Hasparren', legend: '24-03 : Repas', time: 'A définir', contact: '05.59.29...' }
         ];
 
         // Persistence des horaires modifiés
@@ -253,7 +315,6 @@
         function getPopupHTML(loc, index) {
             const theme = themes[loc.type];
             
-            // Génération du bloc contact s'il existe
             const contactHTML = loc.contact ? `
                 <div class="flex items-start gap-2 mb-2 bg-gray-50 p-2 rounded border border-gray-200 shadow-sm">
                     <i class="fa-solid fa-phone text-[10px] mt-0.5" style="color: ${theme.hex}"></i>
@@ -261,11 +322,27 @@
                 </div>
             ` : '';
 
+            // Zone pill styling
+            let zoneName = "Plénière";
+            let zoneColor = "bg-gray-200 text-gray-800";
+            if(loc.zone === 'amikuze') { zoneName = "Amikuze"; zoneColor = "bg-orange-100 text-orange-800 border-orange-300"; }
+            if(loc.zone === 'garazi') { zoneName = "Garazi"; zoneColor = "bg-red-100 text-red-800 border-red-300"; }
+            if(loc.zone === 'sudpb') { zoneName = "Sud PB"; zoneColor = "bg-blue-100 text-blue-800 border-blue-300"; }
+            if(loc.zone === 'errobi') { zoneName = "Errobi"; zoneColor = "bg-green-100 text-green-800 border-green-300"; }
+            if(loc.zone === 'bab') { zoneName = "CBA (BAB)"; zoneColor = "bg-cyan-100 text-cyan-800 border-cyan-300"; }
+            if(loc.zone === 'seignanx') { zoneName = "Seignanx"; zoneColor = "bg-purple-100 text-purple-800 border-purple-300"; }
+
             return `
                 <div class="font-body">
-                    <span class="inline-block px-2 py-0.5 mb-2 text-[8px] font-black uppercase rounded border-2 border-black" style="background-color: ${theme.hex}; color: ${loc.type==='repas'?'black':'white'}">
-                        ${loc.type}
-                    </span>
+                    <div class="flex items-center gap-1 mb-2">
+                        <span class="inline-block px-2 py-0.5 text-[8px] font-black uppercase rounded border-2 border-black shadow-[1px_1px_0px_0px_black]" style="background-color: ${theme.hex}; color: ${loc.type==='repas'?'black':'white'}">
+                            ${loc.type}
+                        </span>
+                        <span class="inline-block px-1.5 py-0.5 text-[7px] font-bold uppercase rounded border ${zoneColor}">
+                            <i class="fa-solid fa-map-location-dot mr-1"></i> ${zoneName}
+                        </span>
+                    </div>
+                    
                     <h3 class="text-sm font-bold font-header text-darkBg leading-tight mb-1">${loc.title}</h3>
                     
                     <div class="flex items-center gap-2 mb-3">
@@ -303,6 +380,7 @@
             locations[i].marker.getPopup().setContent(getPopupHTML(locations[i], i));
         };
 
+        // Création des marqueurs
         locations.forEach((loc, i) => {
             if(savedTimes[i]) loc.time = savedTimes[i];
             const theme = themes[loc.type];
@@ -311,19 +389,35 @@
                 html: `<div class="marker-pin ${theme.css}"><i class="${theme.icon} marker-icon"></i></div>`,
                 iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -32]
             });
-            const marker = L.marker([loc.lat, loc.lng], { icon: icon }).bindPopup(getPopupHTML(loc, i));
-            loc.marker = marker;
-            layers[loc.type].addLayer(marker);
+            loc.marker = L.marker([loc.lat, loc.lng], { icon: icon }).bindPopup(getPopupHTML(loc, i));
+            // Ajout initial
+            loc.marker.addTo(map);
         });
 
-        // Activation des filtres
-        ['ralliement', 'culture', 'institution', 'entreprise', 'repas'].forEach(type => {
-            const el = document.getElementById(`check-${type}`);
-            if (el) {
-                el.addEventListener('change', function() {
-                    this.checked ? map.addLayer(layers[type]) : map.removeLayer(layers[type]);
-                });
-            }
+        // Fonction de filtrage croisé (Thème ET Zone)
+        function updateFilters() {
+            const activeZones = Array.from(document.querySelectorAll('.zone-checkbox:checked')).map(cb => cb.value);
+            const activeThemes = Array.from(document.querySelectorAll('.custom-checkbox:checked')).map(cb => cb.value);
+
+            locations.forEach(loc => {
+                const zoneMatch = activeZones.includes(loc.zone);
+                const themeMatch = activeThemes.includes(loc.type);
+
+                if (zoneMatch && themeMatch) {
+                    if (!map.hasLayer(loc.marker)) {
+                        map.addLayer(loc.marker);
+                    }
+                } else {
+                    if (map.hasLayer(loc.marker)) {
+                        map.removeLayer(loc.marker);
+                    }
+                }
+            });
+        }
+
+        // Écouteurs d'événements pour TOUS les filtres
+        document.querySelectorAll('.filter-trigger').forEach(el => {
+            el.addEventListener('change', updateFilters);
         });
 
         // Géolocalisation
