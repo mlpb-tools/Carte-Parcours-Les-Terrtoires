@@ -68,7 +68,7 @@
             padding: 0;
         }
         .leaflet-popup-tip-container { display: none; }
-        .leaflet-popup-content { margin: 12px; width: 230px !important; }
+        .leaflet-popup-content { margin: 12px; width: 240px !important; }
 
         /* Ajustements UI */
         #map { height: 100%; width: 100%; z-index: 10; }
@@ -140,7 +140,7 @@
                 </div>
 
                 <!-- Aide Contextuelle -->
-                <div class="border-2 border-black rounded-xl p-3 bg-gray-50 text-[10px] font-bold text-gray-600 leading-tight">
+                <div class="border-2 border-black rounded-xl p-3 bg-gray-50 text-[10px] font-bold text-gray-600 leading-tight mt-4">
                     <p class="uppercase text-gray-400 mb-2 border-b border-gray-200 pb-1 italic text-[9px]">Légende Etapes</p>
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-2">
@@ -148,8 +148,8 @@
                             <span>Cliquez sur l'heure pour la modifier</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-info-circle text-red-500"></i>
-                            <span>Date / Lieu / Destination</span>
+                            <i class="fa-solid fa-phone text-emerald-500"></i>
+                            <span>Contact / Téléphone renseigné</span>
                         </div>
                     </div>
                 </div>
@@ -204,47 +204,47 @@
             repas: { css: 'theme-repas', icon: 'fa-solid fa-utensils', hex: '#ffb703' }
         };
 
-        // Données consolidées (Planning 16 au 31 Mars 2026)
+        // Données complètes avec l'intégration des CONTACTS & TELEPHONES du fichier Excel
         const locations = [
             // REGROUPEMENTS PLENIERES
             { lat: 43.329, lng: -1.405, type: 'ralliement', title: 'Sanoki (Itxassou)', address: 'Salle Sanoki', legend: '16/03 / Itxassou / Lancement en plénière', time: '09:00 - 16:30' },
-            { lat: 43.382, lng: -1.303, type: 'ralliement', title: 'Hasparren (Pôle Territorial)', address: 'Pôle Territorial', legend: '19/03 & 31/03 / Hasparren / Restitution portraits & finale', time: '09:00 - 17:00' },
+            { lat: 43.382, lng: -1.303, type: 'ralliement', title: 'Hasparren (Pôle Territorial)', address: 'Pôle Territorial', legend: '19/03 & 31/03 / Hasparren / Restitution', time: '09:00 - 17:00' },
             { lat: 43.395, lng: -1.458, type: 'ralliement', title: 'Ustaritz (Mairie Lapurdi)', address: 'Place du Labourd', legend: '30/03 / Ustaritz / Travail de restitution', time: '09:00 - 16:30' },
             
-            // RALLIEMENTS TERRITOIRES (17, 23, 24, 25 Mars)
+            // RALLIEMENTS TERRITOIRES
             { lat: 43.225, lng: -0.889, type: 'ralliement', title: 'MSP Mauléon', address: '14 Av. de Belzunce', legend: '17, 23, 24, 25 Mars / Mauléon / Visites Soule', time: '08:30' },
             { lat: 43.333, lng: -1.025, type: 'ralliement', title: 'MSP Saint-Palais', address: '1355 route d\'Esquilamborde', legend: '17, 23, 24, 25 Mars / St-Palais / Visites Amikuze', time: '08:30' },
             { lat: 43.167, lng: -1.229, type: 'ralliement', title: 'MSP Garazi', address: 'Route de St-Jean-Pied-de-Port', legend: '17, 23, 24, 25 Mars / Ispoure / Visites Garazi', time: '08:30' },
             { lat: 43.175, lng: -1.346, type: 'ralliement', title: 'Mairie de Baïgorry', address: '21 Gaineko karrika', legend: '17, 23, 24, 25 Mars / Baïgorry / Visites Garazi', time: '08:30' },
-            { lat: 43.383, lng: -1.303, type: 'ralliement', title: 'Centre Elgar', address: '1 Place St-Jean, Hasparren', legend: '17, 23, 24, 25 Mars / Hasparren / Visites Errobi', time: '08:30' },
-            { lat: 43.387, lng: -1.662, type: 'ralliement', title: 'ML St-Jean-de-Luz', address: '34 bd Victor Hugo', legend: '17, 23, 24, 25 Mars / St-Jean-de-Luz / Visites Sud PB', time: '08:30' },
-            { lat: 43.358, lng: -1.774, type: 'ralliement', title: 'Mairie d\'Hendaye', address: 'Place de la République', legend: '17, 23, 24, 25 Mars / Hendaye / Visites Sud PB', time: '08:30' },
-            { lat: 43.498, lng: -1.460, type: 'ralliement', title: 'ML ZUP Bayonne', address: '7 bis avenue de Jouandin', legend: '17, 23, 24, 25 Mars / Bayonne / Visites CBA', time: '08:30' },
-            { lat: 43.492, lng: -1.509, type: 'ralliement', title: 'ML Anglet', address: '10 Rue du Pont de l\'Aveugle', legend: '17, 23, 24, 25 Mars / Anglet / Visites CBA', time: '08:30' },
-            { lat: 43.540, lng: -1.460, type: 'ralliement', title: 'Mairie de Tarnos', address: '14 Bd Jacques Duclos', legend: '17, 23, 24, 25 Mars / Tarnos / Visites Seignanx', time: '08:30' },
             
-            // VISITES (24-25 Mars)
-            { lat: 43.166, lng: -1.233, type: 'culture', title: 'Rugby Nafarroa', address: 'Complexe sportif', legend: '24/03 / Visite Métiers Sport', time: '10:00' },
-            { lat: 43.393, lng: -1.306, type: 'culture', title: 'Padel ELIZABERRIKO', address: 'Hasparren', legend: '24/03 / Visite Métiers Sport', time: '10:00' },
-            { lat: 43.193, lng: -0.903, type: 'culture', title: 'Château Libarrenx', address: 'Gotein-Libarrenx', legend: '24/03 / Visite Culture/Hébergement', time: '14:30' },
-            { lat: 43.396, lng: -1.683, type: 'culture', title: 'Trainière Sokoa', address: 'Port de Socoa', legend: '24/03 / Visite Culture/Sport', time: '14:30' },
-            { lat: 43.541, lng: -1.458, type: 'culture', title: 'GRANDOLA Tarnos', address: 'Bd Jacques Duclos', legend: '24/03 / Visite Tiers-Lieu', time: '10:00' },
-            
-            { lat: 43.383, lng: -1.304, type: 'institution', title: 'ALDATU Hasparren', address: 'Rue Léon Larregain', legend: '24/03 / Visite Appui Entreprises', time: '14:30' },
-            { lat: 43.376, lng: -1.748, type: 'institution', title: 'CPIE HENDAYE', address: 'Domaine d\'Abbadia', legend: '24/03 / Visite Environnement', time: '10:00' },
-            { lat: 43.227, lng: -0.887, type: 'institution', title: 'ODACE Mauléon', address: 'Rue des Frères Barenne', legend: '24/03 / Visite Appui Entreprises', time: '10:00' },
-            { lat: 43.163, lng: -1.237, type: 'institution', title: 'Office Tourisme', address: 'St-Jean-Pied-de-Port', legend: '25/03 / Visite Tourisme', time: '15:30' },
-            
-            { lat: 43.440, lng: -1.551, type: 'entreprise', title: 'IZARRALDE DATA', address: 'Bidart', legend: '24/03 / Visite Numérique', time: '10:00' },
-            { lat: 43.495, lng: -1.474, type: 'entreprise', title: 'CFA IFRIA Bayonne', address: 'Av. Foch', legend: '25/03 / Visite Agroalimentaire', time: '10:00' },
-            { lat: 43.359, lng: -1.399, type: 'entreprise', title: 'Imprimerie MENDIBOURE', address: 'Cambo', legend: '25/03 / Visite Industrie', time: '14:00' },
-            { lat: 43.266, lng: -1.503, type: 'entreprise', title: 'BASERRIBERRI Urdax', address: 'Espagne', legend: '25/03 / Visite Restauration', time: '10:00' },
+            // --- SITES AMIKUZE / XIBEROA (avec Contacts Excel) ---
+            { lat: 43.328, lng: -1.033, type: 'entreprise', title: 'Lycée Jean Errecart (Ifria)', address: 'Saint-Palais', legend: '25/03 / Action Ifria + Agro Alimentaire', time: '10:00', contact: 'André Larralde : 06 12 64 70 75' },
+            { lat: 43.329, lng: -1.035, type: 'culture', title: 'Bilbaka à Amikuze', address: 'Saint-Palais', legend: '25/03 / Visite du site', time: '14:00', contact: 'Irola Stéphane : 06 80 98 87 40' },
+            { lat: 43.224, lng: -0.890, type: 'culture', title: 'Beritxa (Cie Danse)', address: 'Mauléon', legend: '24/03 / Spectacle Danse', time: '10:00', contact: 'Etchecopar Camu' },
+            { lat: 43.227, lng: -0.887, type: 'institution', title: 'ODACE Mauléon', address: 'Rue des Frères Barenne', legend: '24/03 / Visite Appui Entreprises', time: '10:00', contact: '06 84 70 17 08' },
+            { lat: 43.226, lng: -0.892, type: 'entreprise', title: 'SPIREO', address: 'Mauléon', legend: '24/03 / Visite Entreprise', time: '14:30' },
+            { lat: 43.327, lng: -1.031, type: 'repas', title: 'Restaurant Xibiouz', address: 'Saint-Palais', legend: '25/03 / Repas', time: '12:30', contact: 'Sylvie Doxaran : 07 60 71 63 11' },
+            { lat: 43.222, lng: -0.889, type: 'repas', title: 'Euskalduna', address: 'Mauléon', legend: '24/03 / Repas', time: '12:30' },
 
-            // REPAS (24-25 Mars)
-            { lat: 43.393, lng: -1.306, type: 'repas', title: 'Resto Etxebarria', address: 'Hasparren', legend: 'Repas du 24/03', time: '12:30' },
-            { lat: 43.371, lng: -1.412, type: 'repas', title: 'ALDABURUA', address: 'Larressore', legend: 'Repas du 25/03', time: '12:30' },
-            { lat: 43.222, lng: -0.889, type: 'repas', title: 'Euskalduna', address: 'Mauléon', legend: 'Repas du 24/03', time: '12:30' },
-            { lat: 43.165, lng: -1.236, type: 'repas', title: 'Le Chat Perché', address: 'Garazi', legend: 'Repas du 24/03', time: '12:30' }
+            // --- SITES GARAZI (avec Contacts Excel) ---
+            { lat: 43.164, lng: -1.238, type: 'entreprise', title: 'Pays Basque au Coeur', address: 'Garazi', legend: '25/03 / AKILICOP & Récolte du monde', time: '10:00' },
+            { lat: 43.165, lng: -1.235, type: 'culture', title: 'Club Pelote Goizeko Izarra', address: 'Garazi', legend: '24/03 / Sport', time: '14:00', contact: 'Mme Carricaburru : 06 81 49 87 01' },
+            { lat: 43.166, lng: -1.239, type: 'institution', title: 'Ataria / MSP Garazi', address: 'Garazi', legend: '24/03 / Lecture Paysage & France Service', time: '10:00', contact: 'Indart : 06 25 50 48 23' },
+            { lat: 43.168, lng: -1.240, type: 'institution', title: 'Recyclerie Lokala', address: 'Garazi', legend: '24/03 / Visite Recyclerie (1h max)', time: '11:00', contact: '06 41 95 35 26 (pas de restauration)' },
+            { lat: 43.165, lng: -1.236, type: 'repas', title: 'Le Chat Perché', address: 'Garazi', legend: '17/03 et 24/03 / Repas', time: '12:30', contact: '05 24 34 11 49' },
+            { lat: 43.163, lng: -1.234, type: 'repas', title: 'Restaurant Chez Dédé', address: 'Garazi', legend: '25/03 / Repas', time: '12:30', contact: '05 24 34 11 49' },
+
+            // --- SITES SUD PB / TRANSFRONTALIER (avec Contacts Excel) ---
+            { lat: 43.266, lng: -1.503, type: 'entreprise', title: 'BASERRIBERRI & Ent Urdax', address: 'Urdax', legend: '25/03 / Entreprise & Restauration', time: '10:00' },
+            { lat: 43.396, lng: -1.683, type: 'culture', title: 'Trainière Sokoa', address: 'Port de Socoa', legend: '24/03 / Culture/Sport (À confirmer)', time: '14:30' },
+            { lat: 43.376, lng: -1.748, type: 'institution', title: 'CPIE HENDAYE', address: 'Domaine d\'Abbadia', legend: '24/03 / Visite Environnement / Château', time: '09:30' },
+            { lat: 43.358, lng: -1.775, type: 'repas', title: 'l\'Océ', address: 'Hendaye', legend: '24/03 / Repas', time: '12:30', contact: '05 59 20 71 64' },
+            { lat: 43.359, lng: -1.776, type: 'repas', title: 'O\'Yuk', address: 'Hendaye', legend: '24/03 / Repas', time: '12:30', contact: '05 24 33 54 63' },
+            { lat: 43.360, lng: -1.777, type: 'repas', title: 'Sukaldea', address: 'Hendaye', legend: '17/03 / Repas', time: '12:30', contact: '05 59 20 83 21' },
+            { lat: 43.265, lng: -1.505, type: 'repas', title: 'Restaurant sur Urdax', address: 'Urdax', legend: '25/03 / Repas', time: '12:30' },
+
+            // --- SITES ERROBI ---
+            { lat: 43.359, lng: -1.399, type: 'entreprise', title: 'Imprimerie MENDIBOURE', address: 'Cambo', legend: '25/03 / Visite Industrie (9h30)', time: '09:30' }
         ];
 
         // Persistence des horaires modifiés
@@ -252,6 +252,15 @@
 
         function getPopupHTML(loc, index) {
             const theme = themes[loc.type];
+            
+            // Génération du bloc contact s'il existe
+            const contactHTML = loc.contact ? `
+                <div class="flex items-start gap-2 mb-2 bg-gray-50 p-2 rounded border border-gray-200 shadow-sm">
+                    <i class="fa-solid fa-phone text-[10px] mt-0.5" style="color: ${theme.hex}"></i>
+                    <span class="text-[10px] font-bold text-gray-700 leading-tight">${loc.contact}</span>
+                </div>
+            ` : '';
+
             return `
                 <div class="font-body">
                     <span class="inline-block px-2 py-0.5 mb-2 text-[8px] font-black uppercase rounded border-2 border-black" style="background-color: ${theme.hex}; color: ${loc.type==='repas'?'black':'white'}">
@@ -261,16 +270,18 @@
                     
                     <div class="flex items-center gap-2 mb-3">
                         <i class="fa-regular fa-clock text-cyanAccent text-[10px]"></i>
-                        <span id="t-disp-${index}" onclick="editTime(${index})" class="bg-yellow-50 px-2 py-0.5 rounded border border-black font-black cursor-pointer text-[10px] shadow-[1px_1px_0px_0px_black]">
+                        <span id="t-disp-${index}" onclick="editTime(${index})" class="bg-yellow-50 px-2 py-0.5 rounded border border-black font-black cursor-pointer text-[10px] shadow-[1px_1px_0px_0px_black] hover:bg-yellow-200 transition-colors">
                             ${loc.time}
                         </span>
                         <div id="t-edit-${index}" class="hidden flex gap-1">
                             <input type="text" id="t-in-${index}" value="${loc.time}" class="w-16 border border-black rounded p-0.5 text-[10px] font-bold">
-                            <button onclick="saveTime(${index})" class="bg-emerald-500 text-white p-0.5 rounded border border-black text-[8px]"><i class="fa-solid fa-check"></i></button>
+                            <button onclick="saveTime(${index})" class="bg-emerald-500 text-white px-2 py-0.5 rounded border border-black text-[10px] shadow-[1px_1px_0px_0px_black] active:translate-y-0.5 active:shadow-none"><i class="fa-solid fa-check"></i></button>
                         </div>
                     </div>
 
-                    <div class="bg-gray-100 rounded-lg p-2 border border-black text-[9px] font-bold leading-snug">
+                    ${contactHTML}
+
+                    <div class="bg-white rounded-lg p-2 border-2 border-black text-[10px] font-bold leading-snug shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)]">
                         ${loc.legend}
                     </div>
                 </div>
