@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carte Pop Art du Territoire</title>
+<title>Carte Pop Art - Sous-Territoires</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -21,11 +21,11 @@
     --arrondi: 20px;
     --arrondi-max: 30px;
     
-    /* Couleurs des points (vives pour contraster) */
-    --cat-reseau: #FF3B30;
-    --cat-comp: #007B83; 
-    --cat-sol: #34C759;
-    --cat-appui: #FFCC00; 
+    /* Couleurs par sous-territoires */
+    --cat-amikuze: #FF3B30;   /* Rouge */
+    --cat-errobi: #007B83;    /* Bleu canard */
+    --cat-cba: #FFCC00;       /* Jaune */
+    --cat-seignanx: #34C759;  /* Vert */
   }
   
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -147,7 +147,7 @@
     border-radius: var(--arrondi-max); 
     text-transform: uppercase; 
     margin-bottom: 14px; 
-    background: var(--jaune);
+    background: var(--ivoire);
     border: 2px solid var(--noir);
     box-shadow: 2px 2px 0px var(--noir);
     color: var(--noir);
@@ -175,67 +175,74 @@
 <body>
 
   <div class="header">
-    <h1>Carte du Territoire</h1>
-    <p>Mission Locale Pays Basque</p>
+    <h1>Carte des Acteurs</h1>
+    <p>Mission Locale Pays Basque - Répartition par territoires</p>
   </div>
 
   <div id="map"></div>
     
   <div class="legend">
-    <h3>Catégories</h3>
-    <div class="legend-item"><div class="dot" style="background:var(--cat-reseau)"></div> Réseau humain</div>
-    <div class="legend-item"><div class="dot" style="background:var(--cat-comp)"></div> Compétences</div>
-    <div class="legend-item"><div class="dot" style="background:var(--cat-sol)"></div> Solutions pratiques</div>
-    <div class="legend-item"><div class="dot" style="background:var(--cat-appui)"></div> Appuis de maintien</div>
+    <h3>Territoires</h3>
+    <div class="legend-item"><div class="dot" style="background:var(--cat-amikuze)"></div> Amikuze / Xiberoa / Garazi / Sud PB</div>
+    <div class="legend-item"><div class="dot" style="background:var(--cat-errobi)"></div> Errobi / Pays d'Hasparren</div>
+    <div class="legend-item"><div class="dot" style="background:var(--cat-cba)"></div> Côte Basque Adour</div>
+    <div class="legend-item"><div class="dot" style="background:var(--cat-seignanx)"></div> Pays du Seignanx</div>
   </div>
 
 <script>
-// Données pré-chargées
+// Données pré-chargées avec les nouvelles catégories (sous-territoires)
 const initialPins = [
-  {name: "Lycée Jean Errecart", cat: "comp", note: "305 Rte des Écoles, 64120 Saint-Palais", lat: 43.328, lng: -1.033},
-  {name: "Bilbaka", cat: "solutions", note: "95 Ainaren Karrika, 64120 Saint-Palais", lat: 43.330, lng: -1.035},
-  {name: "Akiloukap", cat: "reseau", note: "18 Rue d'Espagne, 64220 Saint-Jean-Pied-de-Port", lat: 43.163, lng: -1.237},
-  {name: "Les Récoltes du monde", cat: "solutions", note: "2 Rue de l'Église, 64220 Saint-Jean-Pied-de-Port", lat: 43.163, lng: -1.236},
-  {name: "Grottes d'Urdax", cat: "appuis", note: "Barrio Leorlas, 31711 Urdazubi", lat: 43.266, lng: -1.503},
-  {name: "Berritza", cat: "appuis", note: "4 Rue de l'Alava, 64130 Mauléon-Licharre", lat: 43.222, lng: -0.888},
-  {name: "Philippe Mayté (Lecture Paysage)", cat: "comp", note: "Château Fort, 64130 Mauléon-Licharre", lat: 43.220, lng: -0.887},
-  {name: "Goizeko Izarra", cat: "appuis", note: "Place Charles de Gaulle, 64220 Saint-Jean-Pied-de-Port", lat: 43.164, lng: -1.237},
-  {name: "Trainière de Socoa", cat: "appuis", note: "Chemin des Blocs, 64500 Ciboure", lat: 43.385, lng: -1.667},
-  {name: "Grottes de Zugarramurdi", cat: "appuis", note: "Beitikokarrika 18, 31710 Zugarramurdi", lat: 43.268, lng: -1.501},
-  {name: "Odace", cat: "solutions", note: "14 Rue des Frères Barenne, 64130 Mauléon-Licharre", lat: 43.224, lng: -0.890},
-  {name: "AZIA", cat: "reseau", note: "Maison du Patrimoine, 64130 Mauléon-Licharre", lat: 43.223, lng: -0.888},
-  {name: "SPI AERO", cat: "comp", note: "Rue du Sécateur, 64130 Mauléon-Licharre", lat: 43.227, lng: -0.895},
-  {name: "Ataria", cat: "comp", note: "Citadelle, 64220 Saint-Jean-Pied-de-Port", lat: 43.162, lng: -1.235},
-  {name: "MSP Garazi", cat: "solutions", note: "11 Rue des Bergers, 64220 Saint-Jean-Pied-de-Port", lat: 43.165, lng: -1.239},
-  {name: "Lokala", cat: "solutions", note: "630 Route de Bayonne, 64220 Ascarat", lat: 43.168, lng: -1.258},
-  {name: "CPIE Littoral Basque", cat: "appuis", note: "Domaine d'Abbadia, 64700 Hendaye", lat: 43.376, lng: -1.750},
-  {name: "ALDATU", cat: "comp", note: "Lotissement Larraidy, 64240 Hasparren", lat: 43.383, lng: -1.304},
-  {name: "Régis Pochelu", cat: "appuis", note: "1005 Chemin de Xurruta, 64240 Hasparren", lat: 43.381, lng: -1.300},
-  {name: "Château Garroa", cat: "appuis", note: "64240 Mendionde", lat: 43.344, lng: -1.298},
-  {name: "Librairie Margot", cat: "solutions", note: "10 Allée Anne de Neubourg, 64250 Cambo-les-Bains", lat: 43.360, lng: -1.400},
-  {name: "Imprimerie Mendiboure", cat: "comp", note: "8 Rue du Cardinal Lavigerie, 64250 Cambo-les-Bains", lat: 43.359, lng: -1.398},
-  {name: "Groupe IZARRALDE", cat: "comp", note: "45 Allée Théodore Monod, 64210 Bidart", lat: 43.438, lng: -1.590},
-  {name: "Cinéma L'Atalante", cat: "appuis", note: "3 Quai Amiral Antoine Sala, 64100 Bayonne", lat: 43.493, lng: -1.468},
-  {name: "Grandola", cat: "solutions", note: "4 Rue des Tonneliers, 64100 Bayonne", lat: 43.491, lng: -1.474},
-  {name: "Office de Tourisme de Bayonne", cat: "solutions", note: "25 Place de la Liberté, 64100 Bayonne", lat: 43.492, lng: -1.475},
-  {name: "Mairie de Tarnos", cat: "solutions", note: "1 Boulevard de la Libération, 40220 Tarnos", lat: 43.540, lng: -1.463},
-  {name: "Corbo Course", cat: "comp", note: "9B Avenue de la Légion Tchèque, 64100 Bayonne", lat: 43.497, lng: -1.470},
-  {name: "Tube à essai / PTCE", cat: "comp", note: "23 Rue Hélène Boucher, 40220 Tarnos", lat: 43.535, lng: -1.465},
-  {name: "Métrolocco", cat: "solutions", note: "23 Rue Hélène Boucher, 40220 Tarnos", lat: 43.535, lng: -1.465}
+  // Amikuze / Xiberoa / Garazi / Sud PB
+  {name: "Lycée Jean Errecart", cat: "amikuze", note: "305 Rte des Écoles, 64120 Saint-Palais", lat: 43.328, lng: -1.033},
+  {name: "Bilbaka", cat: "amikuze", note: "95 Ainaren Karrika, 64120 Saint-Palais", lat: 43.330, lng: -1.035},
+  {name: "Akiloukap", cat: "amikuze", note: "18 Rue d'Espagne, 64220 Saint-Jean-Pied-de-Port", lat: 43.163, lng: -1.237},
+  {name: "Les Récoltes du monde", cat: "amikuze", note: "2 Rue de l'Église, 64220 Saint-Jean-Pied-de-Port", lat: 43.163, lng: -1.236},
+  {name: "Grottes d'Urdax", cat: "amikuze", note: "Barrio Leorlas, 31711 Urdazubi", lat: 43.266, lng: -1.503},
+  {name: "Berritza", cat: "amikuze", note: "4 Rue de l'Alava, 64130 Mauléon-Licharre", lat: 43.222, lng: -0.888},
+  {name: "Philippe Mayté (Lecture Paysage)", cat: "amikuze", note: "Château Fort, 64130 Mauléon-Licharre", lat: 43.220, lng: -0.887},
+  {name: "Goizeko Izarra", cat: "amikuze", note: "Place Charles de Gaulle, 64220 Saint-Jean-Pied-de-Port", lat: 43.164, lng: -1.237},
+  {name: "Trainière de Socoa", cat: "amikuze", note: "Chemin des Blocs, 64500 Ciboure", lat: 43.385, lng: -1.667},
+  {name: "Grottes de Zugarramurdi", cat: "amikuze", note: "Beitikokarrika 18, 31710 Zugarramurdi", lat: 43.268, lng: -1.501},
+  {name: "Odace", cat: "amikuze", note: "14 Rue des Frères Barenne, 64130 Mauléon-Licharre", lat: 43.224, lng: -0.890},
+  {name: "AZIA", cat: "amikuze", note: "Maison du Patrimoine, 64130 Mauléon-Licharre", lat: 43.223, lng: -0.888},
+  {name: "SPI AERO", cat: "amikuze", note: "Rue du Sécateur, 64130 Mauléon-Licharre", lat: 43.227, lng: -0.895},
+  {name: "Ataria", cat: "amikuze", note: "Citadelle, 64220 Saint-Jean-Pied-de-Port", lat: 43.162, lng: -1.235},
+  {name: "MSP Garazi", cat: "amikuze", note: "11 Rue des Bergers, 64220 Saint-Jean-Pied-de-Port", lat: 43.165, lng: -1.239},
+  {name: "Lokala", cat: "amikuze", note: "630 Route de Bayonne, 64220 Ascarat", lat: 43.168, lng: -1.258},
+  {name: "CPIE Littoral Basque", cat: "amikuze", note: "Domaine d'Abbadia, 64700 Hendaye", lat: 43.376, lng: -1.750},
+
+  // Errobi / Pays d'Hasparren
+  {name: "ALDATU", cat: "errobi", note: "Lotissement Larraidy, 64240 Hasparren", lat: 43.383, lng: -1.304},
+  {name: "Régis Pochelu", cat: "errobi", note: "1005 Chemin de Xurruta, 64240 Hasparren", lat: 43.381, lng: -1.300},
+  {name: "Château Garroa", cat: "errobi", note: "64240 Mendionde", lat: 43.344, lng: -1.298},
+  {name: "Librairie Margot", cat: "errobi", note: "10 Allée Anne de Neubourg, 64250 Cambo-les-Bains", lat: 43.360, lng: -1.400},
+  {name: "Imprimerie Mendiboure", cat: "errobi", note: "8 Rue du Cardinal Lavigerie, 64250 Cambo-les-Bains", lat: 43.359, lng: -1.398},
+
+  // Côte Basque Adour
+  {name: "Groupe IZARRALDE", cat: "cba", note: "45 Allée Théodore Monod, 64210 Bidart", lat: 43.438, lng: -1.590},
+  {name: "Cinéma L'Atalante", cat: "cba", note: "3 Quai Amiral Antoine Sala, 64100 Bayonne", lat: 43.493, lng: -1.468},
+  {name: "Grandola", cat: "cba", note: "4 Rue des Tonneliers, 64100 Bayonne", lat: 43.491, lng: -1.474},
+  {name: "Office de Tourisme de Bayonne", cat: "cba", note: "25 Place de la Liberté, 64100 Bayonne", lat: 43.492, lng: -1.475},
+
+  // Pays du Seignanx
+  {name: "Mairie de Tarnos", cat: "seignanx", note: "1 Boulevard de la Libération, 40220 Tarnos", lat: 43.540, lng: -1.463},
+  {name: "Corbo Course", cat: "seignanx", note: "9B Avenue de la Légion Tchèque, 64100 Bayonne", lat: 43.497, lng: -1.470},
+  {name: "Tube à essai / PTCE", cat: "seignanx", note: "23 Rue Hélène Boucher, 40220 Tarnos", lat: 43.535, lng: -1.465},
+  {name: "Métrolocco", cat: "seignanx", note: "23 Rue Hélène Boucher, 40220 Tarnos", lat: 43.535, lng: -1.465}
 ];
 
-// Configuration des catégories avec les couleurs "Pop"
+// Configuration des catégories avec les couleurs "Pop" par territoire
 const CAT_COLORS = { 
-  reseau: '#FF3B30', 
-  comp: '#007B83', 
-  solutions: '#34C759', 
-  appuis: '#FFCC00' 
+  amikuze: '#FF3B30', 
+  errobi: '#007B83', 
+  cba: '#FFCC00', 
+  seignanx: '#34C759' 
 };
 const CAT_LABELS = { 
-  reseau: 'Réseau humain', 
-  comp: 'Compétences', 
-  solutions: 'Solutions pratiques', 
-  appuis: 'Appuis de maintien' 
+  amikuze: 'Amikuze / Xiberoa / Garazi', 
+  errobi: "Errobi / Pays d'Hasparren", 
+  cba: 'Côte Basque Adour', 
+  seignanx: 'Pays du Seignanx' 
 };
 
 // Initialisation de la carte
@@ -244,13 +251,13 @@ const map = L.map('map', {zoomControl: false});
 // On replace le contrôle de zoom en bas à gauche 
 L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-// 🌍 NOUVEAU FOND DE CARTE : STYLE GOOGLE MAPS STANDARD
+// Fond de carte : STYLE GOOGLE MAPS STANDARD
 L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
   maxZoom: 20,
   attribution: '&copy; Google Maps'
 }).addTo(map);
 
-// Fonction pour créer l'icône du point (Point pop art rond avec grosse bordure et ombre)
+// Fonction pour créer l'icône du point
 function makePinIcon(color){
   return L.divIcon({
     className: '',
@@ -269,10 +276,10 @@ initialPins.forEach(function(p){
   
   // Design "Pop Art" de la popup
   const popHtml = `
-    <div class="custom-popup" style="min-width: 200px;">
+    <div class="custom-popup" style="min-width: 220px;">
       <div class="title">${p.name}</div>
-      <div class="cat-badge">
-        <div style="width:10px;height:10px;border-radius:50%;background:${color};border:2px solid #000;"></div>
+      <div class="cat-badge" style="background:${color}; ${color === '#FFCC00' ? 'color:#000;' : 'color:#fff;'}">
+        <div style="width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #000;"></div>
         ${label}
       </div>
       ${p.note ? `<div class="note">"${p.note}"</div>` : ''}
@@ -280,7 +287,7 @@ initialPins.forEach(function(p){
   `;
 
   const marker = L.marker([p.lat, p.lng], { icon: makePinIcon(color) });
-  marker.bindPopup(popHtml, { maxWidth: 300 });
+  marker.bindPopup(popHtml, { maxWidth: 320 });
   markersGroup.addLayer(marker);
 });
 
