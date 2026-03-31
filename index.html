@@ -23,9 +23,9 @@
     
     /* Couleurs des points (vives pour contraster) */
     --cat-reseau: #FF3B30;
-    --cat-comp: #007B83; /* Utilisation du canard */
+    --cat-comp: #007B83; 
     --cat-sol: #34C759;
-    --cat-appui: #FFCC00; /* Utilisation du jaune */
+    --cat-appui: #FFCC00; 
   }
   
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -70,7 +70,7 @@
     color: var(--jaune);
     text-transform: uppercase;
     letter-spacing: -1px;
-    text-shadow: 2px 2px 0px var(--noir); /* Accent pop */
+    text-shadow: 2px 2px 0px var(--noir); 
     line-height: 1.1;
   }
   .header p { 
@@ -125,7 +125,7 @@
     box-shadow: var(--ombre-solide) !important; 
     padding: 0;
   }
-  .leaflet-popup-tip-container { display: none; /* On cache la pointe pour un look "boîte" */ }
+  .leaflet-popup-tip-container { display: none; }
   .leaflet-popup-content { margin: 20px; }
   
   .custom-popup .title { 
@@ -153,7 +153,6 @@
     color: var(--noir);
   }
   
-  /* Effet texte en italique sur fond noir */
   .custom-popup .note { 
     font-size: 13px; 
     font-weight: 500;
@@ -165,7 +164,6 @@
     line-height: 1.5;
   }
 
-  /* Suppression du contour focus par défaut */
   a.leaflet-popup-close-button {
     color: var(--noir) !important;
     font-weight: 900 !important;
@@ -241,15 +239,15 @@ const CAT_LABELS = {
 };
 
 // Initialisation de la carte
-const map = L.map('map', {zoomControl: false}); // On cache le zoom de base pour le replacer
+const map = L.map('map', {zoomControl: false}); 
 
-// On replace le contrôle de zoom en bas à gauche pour ne pas gêner la légende ou le header
+// On replace le contrôle de zoom en bas à gauche 
 L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-// Fond de carte clair et minimaliste pour que les couleurs ressortent bien
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  maxZoom: 19,
-  attribution: '&copy; OpenStreetMap &copy; CARTO'
+// 🌍 NOUVEAU FOND DE CARTE : STYLE GOOGLE MAPS STANDARD
+L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+  maxZoom: 20,
+  attribution: '&copy; Google Maps'
 }).addTo(map);
 
 // Fonction pour créer l'icône du point (Point pop art rond avec grosse bordure et ombre)
